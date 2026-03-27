@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "HelpHub",
+  "name": "HelpHub – Emergency Help & Animal Rescue",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +20,10 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#e53e3e",
+  "background_color": "#ffffff",
+  "description": "Social emergency help platform for people, animals, food, clothes, medicine, and blood.",
+  "orientation": "any",
+  "scope": "/",
+  "lang": "en"
 }
