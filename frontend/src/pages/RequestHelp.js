@@ -1,7 +1,6 @@
-// src/pages/RequestHelp.js - AUTO LOCATION + PHOTO
+// src/pages/RequestHelp.js - FULLY FIXED
 import React, { useState, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const HELP_TYPES = [
   { value: "food", label: "Food" },
@@ -13,7 +12,11 @@ const HELP_TYPES = [
 ];
 
 export default function RequestHelp() {
-  const { user, isLoggedIn } = useAuth();
+  // ✅ CHECK TOKEN DIRECTLY (no AuthContext needed)
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const isLoggedIn = !!token;
+  
   const [form, setForm] = useState({
     type: "general",
     description: "",
@@ -25,20 +28,60 @@ export default function RequestHelp() {
   const [photoPreview, setPhotoPreview] = useState(null);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [locating, setLocating] = useState(false);  // ✅ GPS status
-  const locationInputRef = useRef(null);  // ✅ Focus after GPS
+  const [locating, setLocating] = useState(false);
+  const locationInputRef = useRef(null);
   const navigate = useNavigate();
 
+  // ✅ SHOW LOGIN MESSAGE IF NO TOKEN
   if (!isLoggedIn) {
     return (
-      <div className="container">
-        <h2>Request Help</h2>
-        <p>Please <a href="/login">login</a> to request help.</p>
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        padding: '20px',
+        background: '#f8fafc'
+      }}>
+        <div style={{
+          textAlign: 'center',
+          padding: '60px 40px',
+          background: 'white',
+          borderRadius: '20px',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+          maxWidth: '400px',
+          margin: '0 auto'
+        }}>
+          <h2 style={{ color: '#ef4444', fontSize: '28px', marginBottom: '16px' }}>
+            🔒 Please Login
+          </h2>
+          <p style={{ color: '#6b7280', fontSize: '18px', marginBottom: '24px' }}>
+            You need to login to request help
+          </p>
+          <a 
+            href="/login" 
+            style={{
+              background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+              color: 'white',
+              padding: '16px 32px',
+              borderRadius: '12px',
+              textDecoration: 'none',
+              fontWeight: '600',
+              fontSize: '16px',
+              display: 'inline-block'
+            }}
+          >
+            Go to Login →
+          </a>
+          <div style={{ marginTop: '24px', fontSize: '14px', color: '#9ca3af' }}>
+            Token missing. Login saves token to localStorage.
+          </div>
+        </div>
       </div>
     );
   }
 
-  // ✅ AUTO DETECT LOCATION (GPS)
+  // ✅ AUTO GPS LOCATION
   const detectLocation = () => {
     if (!navigator.geolocation) {
       alert('Geolocation not supported');
@@ -49,7 +92,6 @@ export default function RequestHelp() {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         try {
-          // Reverse geocode coordinates to address
           const { latitude, longitude } = position.coords;
           const response = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
@@ -61,10 +103,8 @@ export default function RequestHelp() {
           
           setForm(prev => ({ ...prev, location }));
           locationInputRef.current?.focus();
-          
           alert(`📍 Location detected: ${location}`);
         } catch (error) {
-          // Fallback to coordinates
           setForm(prev => ({ 
             ...prev, 
             location: `Lat: ${position.coords.latitude.toFixed(2)}, Lng: ${position.coords.longitude.toFixed(2)}`
@@ -107,16 +147,41 @@ export default function RequestHelp() {
     return Object.keys(newErrors).length === 0;
   };
 
+  // ✅ REAL BACKEND SUBMIT
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
     
-    setTimeout(() => {
+    try {
+      const formData = new FormData();
+      formData.append('type', form.type);
+      formData.append('description', form.description);
+      formData.append('location', form.location);
+      formData.append('contact', form.contact);
+      formData.append('priority', form.priority);
+      formData.append('photo', photo);
+      
+      const response = await fetch('http://localhost:5000/api/requests', {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}` 
+        },
+        body: formData
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        alert('✅ Request submitted successfully!');
+        navigate("/status");
+      } else {
+        alert('Error: ' + data.error);
+      }
+    } catch (error) {
+      alert('Network error. Please try again.');
+    } finally {
       setLoading(false);
-      alert('✅ Request submitted successfully!');
-      navigate("/status");
-    }, 2000);
+    }
   };
 
   return (
@@ -133,6 +198,7 @@ export default function RequestHelp() {
           Request Help
         </h2>
         <p style={{ color: '#6b7280', textAlign: 'center', marginBottom: '32px' }}>
+          Welcome {user.name || user.email} 👋
         </p>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -152,7 +218,7 @@ export default function RequestHelp() {
           {/* Description */}
           <div>
             <label style={{ fontWeight: '600', color: '#374151', marginBottom: '8px', display: 'block' }}>
-              Description
+              Description <span style={{ color: '#ef4444' }}>*</span>
             </label>
             <textarea name="description" rows="4" value={form.description} onChange={handleChange} disabled={loading}
               style={{ width: '100%', padding: '12px 16px', border: errors.description ? '2px solid #ef4444' : '2px solid #e5e7eb', borderRadius: '12px', fontSize: '16px', background: '#f9fafb', resize: 'vertical' }}
@@ -160,7 +226,7 @@ export default function RequestHelp() {
             {errors.description && <p style={{ color: '#ef4444', fontSize: '14px', marginTop: '4px' }}>{errors.description}</p>}
           </div>
 
-          {/* ✅ LOCATION WITH AUTO-DETECT */}
+          {/* Location */}
           <div>
             <label style={{ fontWeight: '600', color: '#374151', marginBottom: '8px', display: 'block' }}>
               📍 Location <span style={{ color: '#ef4444' }}>*</span>
@@ -208,36 +274,108 @@ export default function RequestHelp() {
           {/* Contact */}
           <div>
             <label style={{ fontWeight: '600', color: '#374151', marginBottom: '8px', display: 'block' }}>
-              Contact (Phone/Email)
+              Contact (Phone/Email) <span style={{ color: '#ef4444' }}>*</span>
             </label>
-            <input name="contact" type="text" value={form.contact} onChange={handleChange} disabled={loading}
-              style={{ width: '100%', padding: '12px 16px', border: errors.contact ? '2px solid #ef4444' : '2px solid #e5e7eb', borderRadius: '12px', fontSize: '16px', background: '#f9fafb' }}
-              placeholder="Phone number or email" />
+            <input 
+              name="contact" 
+              type="text" 
+              value={form.contact} 
+              onChange={handleChange} 
+              disabled={loading}
+              style={{ 
+                width: '100%', 
+                padding: '12px 16px', 
+                border: errors.contact ? '2px solid #ef4444' : '2px solid #e5e7eb', 
+                borderRadius: '12px', 
+                fontSize: '16px', 
+                background: '#f9fafb' 
+              }} 
+              placeholder="e.g. +91 9876543210 or help@example.com"
+            />
+            {errors.contact && <p style={{ color: '#ef4444', fontSize: '14px', marginTop: '4px' }}>{errors.contact}</p>}
           </div>
 
-          {/* Photo Upload */}
+          {/* Priority */}
           <div>
-            <label style={{ fontWeight: '600', color: '#374151', marginBottom: '12px', display: 'block' }}>
-              📸 Photo Proof (REQUIRED) <span style={{ color: '#ef4444' }}>*</span>
+            <label style={{ fontWeight: '600', color: '#374151', marginBottom: '8px', display: 'block' }}>
+              Priority
             </label>
-            <input type="file" accept="image/*" onChange={handlePhotoChange} required disabled={loading}
-              style={{ width: '100%', padding: '12px', border: errors.photo ? '2px solid #ef4444' : '2px solid #e5e7eb', borderRadius: '12px', background: '#f9fafb' }} />
+            <select 
+              name="priority" 
+              value={form.priority} 
+              onChange={handleChange} 
+              disabled={loading}
+              style={{ 
+                width: '100%', 
+                padding: '12px 16px', 
+                border: '2px solid #e5e7eb', 
+                borderRadius: '12px', 
+                fontSize: '16px', 
+                background: '#f9fafb' 
+              }}
+            >
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+
+          {/* Photo */}
+          <div>
+            <label style={{ fontWeight: '600', color: '#374151', marginBottom: '8px', display: 'block' }}>
+              Photo Proof <span style={{ color: '#ef4444' }}>*</span>
+            </label>
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={handlePhotoChange} 
+              disabled={loading}
+              style={{ 
+                width: '100%', 
+                padding: '12px 16px', 
+                border: errors.photo ? '2px solid #ef4444' : '2px solid #e5e7eb', 
+                borderRadius: '12px', 
+                fontSize: '16px', 
+                background: '#f9fafb' 
+              }}
+            />
             {photoPreview && (
-              <div style={{ marginTop: '16px', textAlign: 'center' }}>
-                <img src={photoPreview} alt="Preview" style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }} />
-                <p style={{ color: '#6b7280', fontSize: '14px', marginTop: '8px' }}>✅ {photo.name}</p>
+              <div style={{ marginTop: '12px' }}>
+                <img 
+                  src={photoPreview} 
+                  alt="Preview" 
+                  style={{ 
+                    maxWidth: '100%', 
+                    maxHeight: '150px', 
+                    borderRadius: '8px', 
+                    border: '1px solid #e5e7eb' 
+                  }} 
+                />
               </div>
             )}
+            {errors.photo && <p style={{ color: '#ef4444', fontSize: '14px', marginTop: '4px' }}>{errors.photo}</p>}
           </div>
 
-          <button type="submit" disabled={loading || !photo} style={{
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            color: 'white', padding: '16px 32px', border: 'none', borderRadius: '12px',
-            fontSize: '18px', fontWeight: '700', cursor: loading || !photo ? 'not-allowed' : 'pointer',
-            opacity: loading || !photo ? 0.6 : 1
-          }}>
-            {loading ? '📤 Submitting...' : '📤 Send Request'}
-          </button>
+          {/* Submit */}
+          <div style={{ marginTop: '16px' }}>
+            <button 
+              type="submit" 
+              disabled={loading}
+              style={{ 
+                width: '100%', 
+                padding: '16px 24px', 
+                background: `linear-gradient(135deg, #059669 ${loading ? 0 : 100}%, #047857 100%)`, 
+                color: 'white', 
+                border: 'none', 
+                borderRadius: '12px', 
+                fontSize: '16px', 
+                fontWeight: '600', 
+                cursor: loading ? 'not-allowed' : 'pointer' 
+              }}
+            >
+              {loading ? '🚀 Submitting...' : '🚀 Submit Help Request'}
+            </button>
+          </div>
         </form>
       </div>
     </div>

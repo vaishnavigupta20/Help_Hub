@@ -13,6 +13,8 @@ import AnimalRescue from './pages/AnimalRescue';
 import HelpList from './pages/HelpList';
 import NotFound from './pages/NotFound';
 import Status from './pages/Status';
+import Profile from './pages/Profile'
+import Home from '../src/pages/Home';
 
 // ✅ ADMIN PAGES
 import AdminLogin from './pages/AdminLogin';
@@ -30,12 +32,13 @@ function App() {
           <main className="container">
             <Routes>
               {/* ✅ PUBLIC ROUTES (No login required) */}
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/" element={<Home />} />
               <Route path="/donate" element={<Donate />} />
               <Route path="/animal-rescue" element={<AnimalRescue />} />
               <Route path="/request" element={<HelpList />} />
               <Route path="/help-list" element={<HelpList />} />
               <Route path="/status" element={<Status />} />
+              <Route path="/profile" element={<Profile />} />
               
               {/* ✅ AUTH ROUTES */}
               <Route path="/login" element={<Login />} />

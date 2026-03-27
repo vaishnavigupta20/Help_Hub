@@ -1,14 +1,18 @@
-// src/components/Navbar.js - Add auth buttons
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+// src/components/Navbar.js - ESLint FIXED
+import React, { useState } from 'react';  // ✅ Added useState import
+import { Link, useNavigate } from 'react-router-dom';  // ✅ Link already imported
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  // ✅ ALL HOOKS AT TOP (before any early returns)
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const token = localStorage.getItem('token');
+  const userData = JSON.parse(localStorage.getItem('user') || '{}');
+  const isLoggedIn = !!token;
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     navigate('/');
   };
 
@@ -27,17 +31,39 @@ export default function Navbar() {
         </Link>
         
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <Link to="/donate" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600' }}>Donate</Link>
-          <Link to="/request-help" style={{ color: '#111827', textDecoration: 'none', fontWeight: '500' }}>Request Help</Link>
+          {/* Public Links */}
+          <Link to="/donate" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600' }}>
+            Donate
+          </Link>
           
-          {user ? (
+          {isLoggedIn ? (
             <>
-              <span style={{ color: '#6b7280' }}>👋 {user.name}</span>
+              {/* Desktop: Show all links */}
+              <Link to="/request-help" style={{ color: '#111827', textDecoration: 'none', fontWeight: '500' }}>
+                Request Help
+              </Link>
+              <Link to="/status" style={{ color: '#10b981', textDecoration: 'none', fontWeight: '500' }}>
+                📊 Status
+              </Link>
+              <Link to="/profile" style={{ color: '#8b5cf6', textDecoration: 'none', fontWeight: '500' }}>
+                👤 Profile
+              </Link>
+              
+              <span style={{ color: '#6b7280', fontSize: '14px' }}>
+                👋 {userData.name || userData.email}
+              </span>
+              
               <button 
                 onClick={handleLogout}
                 style={{
-                  background: '#ef4444', color: 'white', padding: '10px 20px',
-                  border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer'
+                  background: '#ef4444', 
+                  color: 'white', 
+                  padding: '10px 20px',
+                  border: 'none', 
+                  borderRadius: '8px', 
+                  fontWeight: '600', 
+                  cursor: 'pointer',
+                  fontSize: '14px'
                 }}
               >
                 Logout
@@ -45,11 +71,19 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link to="/login" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600' }}>Login</Link>
+              <Link to="/login" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '600' }}>
+                Login
+              </Link>
               <Link to="/signup" style={{ 
-                background: '#3b82f6', color: 'white', padding: '10px 20px',
-                textDecoration: 'none', borderRadius: '8px', fontWeight: '600'
-              }}>Sign Up</Link>
+                background: '#3b82f6', 
+                color: 'white', 
+                padding: '10px 20px',
+                textDecoration: 'none', 
+                borderRadius: '8px', 
+                fontWeight: '600'
+              }}>
+                Sign Up
+              </Link>
             </>
           )}
         </div>
