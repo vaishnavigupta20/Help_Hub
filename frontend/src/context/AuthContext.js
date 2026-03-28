@@ -1,4 +1,4 @@
-// src/context/AuthContext.js
+// src/context/AuthContext.js - FIXED NETWORK ERROR
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
@@ -15,75 +15,84 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // ✅ FIXED: Use CONSISTENT token key 'token' everywhere
   useEffect(() => {
-    // Check localStorage for token
-    const token = localStorage.getItem('userToken');
+    const token = localStorage.getItem('token');  // ← FIXED: was 'userToken'
     if (token) {
-      // Verify with backend
-      fetch('http://localhost:5000/api/user/me', {
+      fetch('/api/user/me', {  // ← FIXED: Use proxy URL
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            setUser(data.user);
-          } else {
-            localStorage.removeItem('userToken');
-          }
-        })
-        .catch(() => localStorage.removeItem('userToken'))
-        .finally(() => setLoading(false));
+      .then(res => {
+        if (res.ok) return res.json();
+        throw new Error('Token invalid');
+      })
+      .then(data => {
+        setUser(data);  // ← Backend returns full user object
+      })
+      .catch(() => {
+        localStorage.removeItem('token');  // ← FIXED: consistent key
+      })
+      .finally(() => setLoading(false));
     } else {
       setLoading(false);
     }
   }, []);
 
+  // ✅ FIXED: Use proxy URL + consistent token key
   const login = async (email, password) => {
     try {
-      const res = await fetch('http://localhost:5000/api/login', {
+      const response = await fetch('/api/login', {  // ← Proxy URL
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
-      const data = await res.json();
       
-      if (data.success) {
-        localStorage.setItem('userToken', data.token);
-        setUser(data.user);
-        return { success: true, user: data.user };
+      const data = await response.json();
+      
+      if (!response.ok) {
+        return { success: false, error: data.error || 'Login failed' };
       }
-      return { success: false, error: data.error };
+      
+      // ✅ FIXED: Store with 'token' key (matches useEffect)
+      localStorage.setItem('token', data.token);
+      setUser(data.user);
+      
+      return { success: true, user: data.user };
+      
     } catch (error) {
-      return { success: false, error: 'Network error' };
+      return { success: false, error: 'Network error. Check backend on port 5000' };
     }
   };
 
-  const signup = async (name, email, password, role = 'user') => {
+  // ✅ FIXED: Use proxy URL consistently
+  const signup = async (name, email, password, role, phone) => {
     try {
-      const res = await fetch('http://localhost:5000/api/signup', {
+      const response = await fetch('/api/signup', {  // ← Proxy URL
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, role })
+        body: JSON.stringify({ name, email, password, role, phone })
       });
-      const data = await res.json();
       
-      if (data.success) {
-        localStorage.setItem('userToken', data.token);
-        setUser(data.user);
-        return { success: true, user: data.user };
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Signup failed');
       }
-      return { success: false, error: data.error };
+      
+      localStorage.setItem('token', data.token);
+      setUser(data.user);
+      return data;
+      
     } catch (error) {
-      return { success: false, error: 'Network error' };
+      throw new Error(error.message || 'Signup failed');
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('userToken');
-    localStorage.removeItem('adminToken');
+    localStorage.removeItem('token');  // ← FIXED: consistent key
     setUser(null);
   };
 

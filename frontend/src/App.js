@@ -1,3 +1,4 @@
+// src/App.js - ✅ CLEANED UP & FIXED
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
@@ -7,14 +8,18 @@ import Signup from './pages/Signup';
 import RequestHelp from './pages/RequestHelp';
 import Dashboard from './pages/Dashboard';
 
-// ✅ NEW PAGES
+// ✅ USER PAGES
 import Donate from './pages/Donate';
 import AnimalRescue from './pages/AnimalRescue';
 import HelpList from './pages/HelpList';
 import NotFound from './pages/NotFound';
 import Status from './pages/Status';
-import Profile from './pages/Profile'
-import Home from '../src/pages/Home';
+import Profile from './pages/Profile';
+import Home from './pages/Home';
+import AvailableRequests from './pages/AvailableRequests';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+
 
 // ✅ ADMIN PAGES
 import AdminLogin from './pages/AdminLogin';
@@ -35,17 +40,12 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/donate" element={<Donate />} />
               <Route path="/animal-rescue" element={<AnimalRescue />} />
-              <Route path="/request" element={<HelpList />} />
-              <Route path="/help-list" element={<HelpList />} />
-              <Route path="/status" element={<Status />} />
-              <Route path="/profile" element={<Profile />} />
-              
-              {/* ✅ AUTH ROUTES */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+              <Route path="/help-list" element={<HelpList />} />  {/* ✅ Your HelpList */}
               <Route path="/admin-login" element={<AdminLogin />} />
 
-              {/* ✅ PROTECTED USER ROUTES (Registered users only) */}
+              {/* ✅ PROTECTED USER ROUTES (Login required) */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
               <Route 
                 path="/request-help" 
                 element={
@@ -54,6 +54,7 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
+              <Route path="/blood-network" element={<Navigate to="/help-list?type=blood" replace />} /> 
               <Route 
                 path="/dashboard" 
                 element={
@@ -62,8 +63,41 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
-
+              <Route 
+                path="/status" 
+                element={
+                  <ProtectedRoute>
+                    <Status />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/profile" 
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/available-requests" 
+                element={
+                  <ProtectedRoute>
+                    <AvailableRequests />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
               {/* ✅ ADMIN ONLY ROUTES */}
+              <Route 
+                path="/admin" 
+                element={
+                  <ProtectedRoute adminOnly={true}>
+                    <AdminNGOs />
+                  </ProtectedRoute>
+                } 
+              />
               <Route 
                 path="/admin/ngos" 
                 element={
@@ -74,9 +108,9 @@ function App() {
               />
 
               {/* ✅ REDIRECTS */}
-              <Route path="/admin" element={<Navigate to="/admin/ngos" replace />} />
-              
-              {/* ✅ 404 CATCH-ALL */}
+              <Route path="/request" element={<Navigate to="/help-list" replace />} />
+
+              {/* ✅ 404 CATCH-ALL (LAST) */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>

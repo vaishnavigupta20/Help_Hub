@@ -149,40 +149,60 @@ export default function RequestHelp() {
 
   // ✅ REAL BACKEND SUBMIT
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
-    setLoading(true);
+  e.preventDefault();
+  if (!validate()) return;
+  setLoading(true);
+  
+  try {
+    const formData = new FormData();
+    formData.append('type', form.type);
+    formData.append('description', form.description);
+    formData.append('location', form.location);
+    formData.append('contact', form.contact);
+    formData.append('priority', form.priority);
+    formData.append('photo', photo);
     
-    try {
-      const formData = new FormData();
-      formData.append('type', form.type);
-      formData.append('description', form.description);
-      formData.append('location', form.location);
-      formData.append('contact', form.contact);
-      formData.append('priority', form.priority);
-      formData.append('photo', photo);
+    const response = await fetch('http://localhost:5000/api/requests', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: formData
+    });
+    
+    const data = await response.json();
+    if (data.success) {
+      // ✅ ADD THIS: Save to localStorage for Status.js sync
+      const newRequest = {
+        id: Date.now(), // Unique ID
+        title: form.description.substring(0, 50) + '...',
+        type: form.type,
+        location: form.location,
+        status: 'Pending',
+        date: new Date().toLocaleString('en-IN', { 
+          weekday: 'short', 
+          hour: 'numeric', 
+          minute: 'numeric',
+          day: 'numeric'
+        }),
+        priority: form.priority,
+        description: form.description,
+        contact: form.contact
+      };
       
-      const response = await fetch('http://localhost:5000/api/requests', {
-        method: 'POST',
-        headers: { 
-          'Authorization': `Bearer ${token}` 
-        },
-        body: formData
-      });
+      // Load existing + add new
+      const existingRequests = JSON.parse(localStorage.getItem('myRequests') || '[]');
+      localStorage.setItem('myRequests', JSON.stringify([newRequest, ...existingRequests]));
       
-      const data = await response.json();
-      if (data.success) {
-        alert('✅ Request submitted successfully!');
-        navigate("/status");
-      } else {
-        alert('Error: ' + data.error);
-      }
-    } catch (error) {
-      alert('Network error. Please try again.');
-    } finally {
-      setLoading(false);
+      alert('✅ Request submitted successfully!');
+      navigate("/status");
+    } else {
+      alert('Error: ' + data.error);
     }
-  };
+  } catch (error) {
+    alert('Network error. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div style={{ minHeight: '100vh', padding: '20px 0', background: 'white' }}>

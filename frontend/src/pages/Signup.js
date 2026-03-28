@@ -47,26 +47,21 @@ export default function Signup() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
     setLoading(true);
     try {
-      await signup(
-        form.name,
-        form.email,
-        form.password,
-        form.role,
-        form.phone
-      );
+      await signup(form.name, form.email, form.password, form.role, form.phone);
+      // SUCCESS: Redirect to home
+      navigate('/', { replace: true }); 
     } catch (err) {
-      setErrors({ general: "Signup failed. Please try again." });
+      setErrors({ general: err.message || "Signup failed." });
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <div className="container">
       <div className="auth-container">
@@ -154,8 +149,7 @@ export default function Signup() {
               <option value="user">Regular User</option>
               <option value="ngo">NGO / Rescue Organization</option>
               <option value="volunteer">Volunteer</option>
-              <option value="donor">Blood / Donor / Food Donor</option>
-              <option value="admin">Admin (if enabled)</option>
+              <option value="donor">Blood Donor / Food Donor</option>
             </select>
           </div>
 

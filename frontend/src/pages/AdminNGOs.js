@@ -1,4 +1,4 @@
-// src/pages/AdminNGOs.js - COMPLETE WITH HEADER ADD NGO BUTTON
+// src/pages/AdminNGOs.js - ✅ COMPLETE & PERFECT
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -6,7 +6,12 @@ export default function AdminNGOs() {
   const navigate = useNavigate();
   const [ngos, setNgos] = useState([]);
   const [form, setForm] = useState({
-    name: '', description: '', phone: '', upi: '', color: '#FF6B35', active: true
+    name: '', 
+    description: '', 
+    phone: '', 
+    upi: '', 
+    color: '#FF6B35', 
+    active: true
   });
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -231,6 +236,9 @@ export default function AdminNGOs() {
                       <h3 style={{ fontSize: '20px', fontWeight: '700', color: '#111827', margin: '0 0 4px 0' }}>
                         {ngo.name}
                       </h3>
+                      <p style={{ color: '#6b7280', margin: '0 0 4px 0', fontSize: '15px' }}>
+                        {ngo.description || 'No description'}
+                      </p>
                       <p style={{ color: '#6b7280', margin: 0, fontSize: '15px' }}>
                         {ngo.upi}
                       </p>
@@ -264,7 +272,7 @@ export default function AdminNGOs() {
           )}
         </div>
 
-        {/* ADD/EDIT FORM */}
+        {/* ✅ ADD/EDIT FORM - PROPERLY STRUCTURED */}
         <div style={{
           background: 'white', padding: '32px', borderRadius: '20px',
           boxShadow: '0 10px 40px rgba(0,0,0,0.1)'
@@ -290,49 +298,121 @@ export default function AdminNGOs() {
           </div>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <input 
-              placeholder="NGO Name *" 
-              value={form.name} 
-              onChange={(e) => setForm({...form, name: e.target.value})}
-              style={{ padding: '14px 16px', border: '2px solid #e5e7eb', borderRadius: '12px', fontSize: '16px' }}
-              required 
-            />
-            <input 
-              placeholder="Description" 
-              value={form.description} 
-              onChange={(e) => setForm({...form, description: e.target.value})}
-              style={{ padding: '14px 16px', border: '2px solid #e5e7eb', borderRadius: '12px', fontSize: '16px' }}
-            />
-            <input 
-              placeholder="Phone Number" 
-              value={form.phone} 
-              onChange={(e) => setForm({...form, phone: e.target.value})}
-              style={{ padding: '14px 16px', border: '2px solid #e5e7eb', borderRadius: '12px', fontSize: '16px' }}
-            />
-            <input 
-              placeholder="UPI ID (name@bank)" 
-              value={form.upi} 
-              onChange={(e) => setForm({...form, upi: e.target.value})}
-              style={{ padding: '14px 16px', border: '2px solid #e5e7eb', borderRadius: '12px', fontSize: '16px' }}
-              required 
-            />
-            <label style={{ fontWeight: '600', marginBottom: '8px', color: '#374151' }}>Color:</label>
-            <input 
-              type="color" 
-              value={form.color} 
-              onChange={(e) => setForm({...form, color: e.target.value})}
-              style={{ padding: '14px 16px', border: '2px solid #e5e7eb', borderRadius: '12px', height: '50px' }}
-            />
+            {/* ✅ PROPERLY WRAPPED INPUTS WITH LABELS */}
+            <div>
+              <label style={{ fontWeight: '600', marginBottom: '6px', color: '#374151', display: 'block' }}>
+                NGO Name *
+              </label>
+              <input 
+                placeholder="Enter NGO name" 
+                value={form.name} 
+                onChange={(e) => setForm({...form, name: e.target.value})}
+                style={{ 
+                  padding: '14px 16px', 
+                  border: '2px solid #e5e7eb', 
+                  borderRadius: '12px', 
+                  fontSize: '16px',
+                  width: '100%',
+                  boxSizing: 'border-box'
+                }}
+                required 
+              />
+            </div>
+
+            <div>
+              <label style={{ fontWeight: '600', marginBottom: '6px', color: '#374151', display: 'block' }}>
+                Description
+              </label>
+              <input 
+                placeholder="Enter description" 
+                value={form.description} 
+                onChange={(e) => setForm({...form, description: e.target.value})}
+                style={{ 
+                  padding: '14px 16px', 
+                  border: '2px solid #e5e7eb', 
+                  borderRadius: '12px', 
+                  fontSize: '16px',
+                  width: '100%',
+                  boxSizing: 'border-box'
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontWeight: '600', marginBottom: '6px', color: '#374151', display: 'block' }}>
+                Phone Number
+              </label>
+              <input 
+                placeholder="Enter phone number" 
+                value={form.phone} 
+                onChange={(e) => setForm({...form, phone: e.target.value})}
+                style={{ 
+                  padding: '14px 16px', 
+                  border: '2px solid #e5e7eb', 
+                  borderRadius: '12px', 
+                  fontSize: '16px',
+                  width: '100%',
+                  boxSizing: 'border-box'
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontWeight: '600', marginBottom: '6px', color: '#374151', display: 'block' }}>
+                UPI ID (name@bank) *
+              </label>
+              <input 
+                placeholder="example@ybl" 
+                value={form.upi} 
+                onChange={(e) => setForm({...form, upi: e.target.value})}
+                style={{ 
+                  padding: '14px 16px', 
+                  border: '2px solid #e5e7eb', 
+                  borderRadius: '12px', 
+                  fontSize: '16px',
+                  width: '100%',
+                  boxSizing: 'border-box'
+                }}
+                required 
+              />
+            </div>
+
+            <div>
+              <label style={{ fontWeight: '600', marginBottom: '8px', color: '#374151', display: 'block' }}>
+                Brand Color:
+              </label>
+              <input 
+                type="color" 
+                value={form.color} 
+                onChange={(e) => setForm({...form, color: e.target.value})}
+                style={{ 
+                  padding: '12px', 
+                  border: '2px solid #e5e7eb', 
+                  borderRadius: '12px', 
+                  height: '50px',
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  cursor: 'pointer'
+                }}
+              />
+            </div>
+
             <button 
               type="submit" 
               disabled={submitLoading}
               style={{
                 background: editingId ? '#3b82f6' : '#10b981',
-                color: 'white', padding: '16px', border: 'none', borderRadius: '12px',
-                fontSize: '18px', fontWeight: '700', cursor: submitLoading ? 'not-allowed' : 'pointer'
+                color: 'white', 
+                padding: '16px', 
+                border: 'none', 
+                borderRadius: '12px',
+                fontSize: '18px', 
+                fontWeight: '700', 
+                cursor: submitLoading ? 'not-allowed' : 'pointer',
+                opacity: submitLoading ? 0.7 : 1
               }}
             >
-              {submitLoading ? 'Saving...' : (editingId ? 'Update NGO' : 'Add NGO')}
+              {submitLoading ? '💾 Saving...' : (editingId ? '✏️ Update NGO' : '➕ Add NGO')}
             </button>
           </form>
         </div>
