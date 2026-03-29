@@ -8,6 +8,7 @@ export default function Status() {
   const [myRequests, setMyRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
+  const API_BASE = process.env.REACT_APP_API_BASE;
 
   useEffect(() => {
     const fetchMyRequests = async () => {
@@ -23,7 +24,7 @@ export default function Status() {
           return;
         }
 
-        const response = await fetch("http://localhost:5000/api/requests/my", {
+        const response = await fetch(`${API_BASE}/api/requests/my`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
