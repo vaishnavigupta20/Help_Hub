@@ -59,10 +59,11 @@ HelpHub solves this by providing a **location-based digital response network.**
 
 **Frontend**
 
-* HTML
+
 * CSS (Glassmorphism UI)
 * Bootstrap
 * JavaScript
+* React
 * Leaflet.js (Map Integration)
 
 **Backend**
@@ -77,41 +78,13 @@ HelpHub solves this by providing a **location-based digital response network.**
 * REST APIs
 * Session Authentication
 
----
-
-## 📂 Project Structure
-
-```
-HelpHub/
-│
-├── backend/
-│   ├── app.py
-│   ├── config.py
-│   └── routes.py
-│
-├── templates/
-│   ├── index.html
-│   ├── dashboard.html
-│   ├── request_help.html
-│   ├── login.html
-│   ├── signup.html
-│   ├── profile.html
-│   └── my_requests.html
-│
-├── css/
-├── js/
-├── uploads/
-└── README.md
-```
-
----
 
 ## ⚙️ Installation
 
 ### 1️⃣ Clone Repo
 
 ```
-git clone https://github.com/Akash-kr-gupta/HelpHub.git
+git clone https://github.com/vaishnavigupta20/Help_Hub.git
 cd HelpHub
 ```
 
