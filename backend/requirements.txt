@@ -28,3 +28,6 @@ twilio==9.3.0
 
 # Optional
 Pillow==10.4.0
+
+certifi
+dnspython
