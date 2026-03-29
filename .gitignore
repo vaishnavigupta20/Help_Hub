@@ -1,5 +1,9 @@
+# Common ignores
 __pycache__/
 *.pyc
 .env
 venv/
 .DS_Store
+
+# Add your service account key
+backend/serviceAccountKey.json
