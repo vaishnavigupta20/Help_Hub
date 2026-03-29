@@ -27,7 +27,7 @@ import AdminNGOs from './pages/AdminNGOs';
 
 function App() {
   return (
-    <Router basename={process.env.NODE_ENV === 'production' ? '/helphub' : '/'}>
+    <Router>
       <AuthProvider>
         <div className="App">
           <Navbar />
