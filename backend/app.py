@@ -61,15 +61,21 @@ users_collection = db.users
 ngos_collection = db.ngos
 
 # ✅ FIREBASE INIT — guard against missing credentials file
-FIREBASE_CREDENTIALS = os.getenv("FIREBASE_CREDENTIALS", "serviceAccountKey.json")
-if not firebase_admin._apps:
-    if os.path.exists(FIREBASE_CREDENTIALS):
-        cred = credentials.Certificate(FIREBASE_CREDENTIALS)
-        firebase_admin.initialize_app(cred)
-        print("✅ Firebase initialized")
-    else:
-        print(f"⚠️ Firebase credentials file not found at '{FIREBASE_CREDENTIALS}'. Push notifications disabled.")
+import json
 
+firebase_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
+
+if not firebase_admin._apps:
+    try:
+        if firebase_json:
+            cred_dict = json.loads(firebase_json)
+            cred = credentials.Certificate(cred_dict)
+            firebase_admin.initialize_app(cred)
+            print("✅ Firebase initialized from ENV")
+        else:
+            print("⚠️ Firebase credentials not found. Push disabled.")
+    except Exception as e:
+        print(f"❌ Firebase init error: {e}")
 # ✅ TWILIO SMS CONFIG
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "").strip()
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "").strip()
