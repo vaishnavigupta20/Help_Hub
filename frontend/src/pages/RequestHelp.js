@@ -21,7 +21,7 @@ const RequestHelp = () => {
   const [message, setMessage] = useState("");
 
   // ✅ YOUR BACKEND URL (keep as before)
-  const API_BASE = "https://helphub-backend.onrender.com";
+  const API_BASE = "https://help-hub-4.onrender.com/";
 
   // get auth token
   const TOKEN = localStorage.getItem("token");
