@@ -16,6 +16,7 @@ export default function AdminNGOs() {
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
+  const API_BASE = process.env.REACT_APP_API_BASE;
 
   // ✅ CHECK ADMIN LOGIN
   useEffect(() => {
@@ -30,7 +31,7 @@ export default function AdminNGOs() {
   const fetchNgos = async () => {
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:5000/api/ngos');
+      const res = await fetch(`${API_BASE}/api/ngos`);
       const data = await res.json();
       if (data.success) {
         setNgos(data.ngos || []);
@@ -50,7 +51,7 @@ export default function AdminNGOs() {
     
     try {
       const method = editingId ? 'PUT' : 'POST';
-      const url = editingId ? `http://localhost:5000/api/ngos/${editingId}` : 'http://localhost:5000/api/ngos';
+      const url = editingId ? `${API_BASE}/api/ngos/${editingId}` : `${API_BASE}/api/ngos`;
       
       const res = await fetch(url, {
         method,
@@ -81,7 +82,7 @@ export default function AdminNGOs() {
   const deleteNgo = async (id) => {
     if (window.confirm('Delete this NGO?')) {
       try {
-        const res = await fetch(`http://localhost:5000/api/ngos/${id}`, { method: 'DELETE' });
+        const res = await fetch(`${API_BASE}/api/ngos/${id}`, { method: 'DELETE' });
         const data = await res.json();
         if (data.success) {
           fetchNgos();
