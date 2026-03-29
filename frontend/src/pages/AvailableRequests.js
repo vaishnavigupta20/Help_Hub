@@ -15,6 +15,7 @@ export default function AvailableRequests() {
   const [expandedRequest, setExpandedRequest] = useState(null);
   const [loadingAccept, setLoadingAccept] = useState({});
   const [loading, setLoading] = useState(true);
+  const API_BASE = process.env.REACT_APP_API_BASE;
 
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
@@ -45,7 +46,7 @@ export default function AvailableRequests() {
           });
 
           const response = await fetch(
-            `http://localhost:5000/api/requests/unresolved?${params}`,
+            `${API_BASE}/api/requests/unresolved?${params}`,
             {
               headers: { Authorization: `Bearer ${token}` },
             },
@@ -92,7 +93,7 @@ export default function AvailableRequests() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:5000/api/requests/${requestId}/resolve`,
+        `${API_BASE}/api/requests/${requestId}/resolve`,
         {
           method: "POST",
           headers: {
