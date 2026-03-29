@@ -10,7 +10,8 @@ export default function Profile() {
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
-
+  const API_BASE = process.env.REACT_APP_API_BASE;
+  
   // ✅ CHECK TOKEN FIRST
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -28,7 +29,7 @@ export default function Profile() {
   const fetchUserProfile = async (token) => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5000/api/user/me', {
+      const response = await fetch(`${API_BASE}/api/user/me`, {
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -69,7 +70,7 @@ export default function Profile() {
     setSaving(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/user/me', {
+      const response = await fetch(`${API_BASE}/api/user/me`, {
         method: 'PUT',
         headers: { 
           'Authorization': `Bearer ${token}`,
