@@ -6,53 +6,136 @@ import { useAuth } from "../context/AuthContext";
 export default function Status() {
   const { user } = useAuth();
   const [myRequests, setMyRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    if (user) {
-      const fetchMyRequests = async () => {
-        try {
-          const token = localStorage.getItem("token");
-          const response = await fetch("http://localhost:5000/api/requests/my", {
-            headers: { "Authorization": `Bearer ${token}` }
-          });
-          const data = await response.json();
+    const fetchMyRequests = async () => {
+      try {
+        setLoading(true);
+        setErrorMsg("");
 
-          if (data.success) {
-            const myRequestsFormatted = data.requests.map(req => ({
-              id: req._id,
-              title: req.description.substring(0, 50) + "...",
-              type: req.help_type,
-              location: req.location,
-              date: new Date(req.created_at).toLocaleDateString("en-IN", {
-                weekday: "short",
-                hour: "numeric",
-                minute: "numeric"
-              }),
-              priority: req.priority,
-              status: req.status || "Pending",
-              description: req.description,
-              contact: req.contact
-            }));
-            setMyRequests(myRequestsFormatted);
-          }
-        } catch (error) {
-          console.error("Failed to fetch my requests:", error);
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          setErrorMsg("Please login again.");
+          setLoading(false);
+          return;
         }
-      };
 
+        const response = await fetch("http://localhost:5000/api/requests/my", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          setErrorMsg(data.error || "Failed to fetch requests.");
+          setLoading(false);
+          return;
+        }
+
+        const myRequestsFormatted = (data.requests || []).map((req) => ({
+          id: req._id || req.id,
+          title: req.description
+            ? req.description.length > 50
+              ? req.description.substring(0, 50) + "..."
+              : req.description
+            : "Help Request",
+          type: req.help_type || req.type || "Other",
+          location: req.location || "Location not available",
+          date: req.created_at
+            ? new Date(req.created_at).toLocaleString("en-IN", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "numeric",
+                minute: "2-digit",
+              })
+            : "Date unavailable",
+          priority: req.priority || "Medium",
+          status: req.status || "Pending",
+          description: req.description || "No description provided",
+          contact: req.contact || "",
+        }));
+
+        setMyRequests(myRequestsFormatted);
+      } catch (error) {
+        console.error("Failed to fetch my requests:", error);
+        setErrorMsg("Failed to fetch my requests.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user) {
       fetchMyRequests();
+    } else {
+      setLoading(false);
     }
   }, [user]);
 
+  const getPriorityStyle = (priority) => {
+    switch (priority) {
+      case "Critical":
+        return {
+          background: "#dbeafe",
+          color: "#1d4ed8",
+        };
+      case "High":
+        return {
+          background: "#fee2e2",
+          color: "#dc2626",
+        };
+      case "Low":
+        return {
+          background: "#ecfdf5",
+          color: "#059669",
+        };
+      default:
+        return {
+          background: "#f3f4f6",
+          color: "#4b5563",
+        };
+    }
+  };
+
+  const getStatusStyle = (status) => {
+    const normalized = status.toLowerCase();
+
+    if (normalized.includes("resolved")) {
+      return {
+        color: "#059669",
+        background: "#f0fdf4",
+      };
+    }
+
+    if (normalized.includes("in progress")) {
+      return {
+        color: "#2563eb",
+        background: "#dbeafe",
+      };
+    }
+
+    return {
+      color: "#d97706",
+      background: "#fef3c7",
+    };
+  };
+
   return (
     <div style={{ padding: "40px 20px", maxWidth: "1200px", margin: "0 auto" }}>
-      {/* Header */}
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: "40px"
+          marginBottom: "40px",
+          flexWrap: "wrap",
+          gap: "16px",
         }}
       >
         <div>
@@ -60,32 +143,32 @@ export default function Status() {
             My Status
           </h1>
           <p style={{ color: "#6b7280", fontSize: "18px", margin: "8px 0 0 0" }}>
-            Track your requests and help history, {user?.name}
+            Track your requests and help history{user?.name ? `, ${user.name}` : ""}
           </p>
         </div>
+
         <Link
           to="/request-help"
           style={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            background: "#2563eb",
             color: "white",
             padding: "12px 24px",
             borderRadius: "12px",
             textDecoration: "none",
-            fontWeight: "600"
+            fontWeight: "600",
           }}
         >
           + New Request
         </Link>
       </div>
 
-      {/* My Requests Section */}
       <div style={{ marginBottom: "48px" }}>
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            marginBottom: "24px"
+            marginBottom: "24px",
           }}
         >
           <h2 style={{ fontSize: "24px", fontWeight: "700", color: "#111827" }}>
@@ -93,12 +176,20 @@ export default function Status() {
           </h2>
         </div>
 
-        {myRequests.length === 0 ? (
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "60px", color: "#6b7280" }}>
+            <p style={{ fontSize: "18px" }}>Loading requests...</p>
+          </div>
+        ) : errorMsg ? (
+          <div style={{ textAlign: "center", padding: "60px", color: "#dc2626" }}>
+            <p style={{ fontSize: "18px" }}>{errorMsg}</p>
+          </div>
+        ) : myRequests.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px", color: "#6b7280" }}>
             <p style={{ fontSize: "18px" }}>No requests yet</p>
             <Link
               to="/request-help"
-              style={{ color: "#667eea", fontWeight: "600" }}
+              style={{ color: "#2563eb", fontWeight: "600" }}
             >
               Create your first request
             </Link>
@@ -113,7 +204,7 @@ export default function Status() {
                   border: "1px solid #e5e7eb",
                   borderRadius: "16px",
                   background: "white",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.04)"
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
                 }}
               >
                 <div
@@ -121,7 +212,9 @@ export default function Status() {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "flex-start",
-                    marginBottom: "16px"
+                    marginBottom: "16px",
+                    gap: "12px",
+                    flexWrap: "wrap",
                   }}
                 >
                   <div style={{ flex: 1 }}>
@@ -130,61 +223,55 @@ export default function Status() {
                         fontSize: "20px",
                         fontWeight: "700",
                         color: "#111827",
-                        margin: "0 0 4px 0"
+                        margin: "0 0 4px 0",
                       }}
                     >
                       {req.title}
                     </h3>
+
                     <div
                       style={{
                         display: "flex",
                         gap: "12px",
                         color: "#6b7280",
                         fontSize: "14px",
-                        flexWrap: "wrap"
+                        flexWrap: "wrap",
                       }}
                     >
                       <span>📍 {req.location}</span>
                       <span>🏷️ {req.type}</span>
                       <span>📅 {req.date}</span>
-                      {req.priority !== "Medium" && (
-                        <span
-                          style={{
-                            padding: "2px 8px",
-                            borderRadius: "6px",
-                            fontSize: "11px",
-                            background:
-                              req.priority === "High"
-                                ? "#fee2e2"
-                                : "#dbeafe",
-                            color:
-                              req.priority === "High"
-                                ? "#dc2626"
-                                : "#1e40af"
-                          }}
-                        >
-                          {req.priority}
-                        </span>
-                      )}
+                      <span
+                        style={{
+                          padding: "2px 8px",
+                          borderRadius: "6px",
+                          fontSize: "11px",
+                          fontWeight: "600",
+                          ...getPriorityStyle(req.priority),
+                        }}
+                      >
+                        {req.priority}
+                      </span>
                     </div>
                   </div>
+
                   <span
                     style={{
                       padding: "6px 12px",
                       borderRadius: "20px",
                       fontSize: "12px",
                       fontWeight: "600",
-                      color: req.status === "Resolved ✅" ? "#059669" : "#d97706",
-                      background: req.status === "Resolved ✅" ? "#f0fdf4" : "#fef3c7"
+                      ...getStatusStyle(req.status),
                     }}
                   >
-                    {req.status || "Pending"}
+                    {req.status}
                   </span>
                 </div>
 
                 <p style={{ color: "#4b5563", fontSize: "14px", margin: "4px 0 8px 0" }}>
-                  📝 {req.description || "No description provided"}
+                  📝 {req.description}
                 </p>
+
                 {req.contact && (
                   <p style={{ color: "#6b7280", fontSize: "13px", margin: 0 }}>
                     📞 {req.contact}

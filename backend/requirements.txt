@@ -1,6 +1,30 @@
 Flask==3.0.3
 Flask-SQLAlchemy==3.1.1
 Flask-Login==0.6.3
+Flask-CORS==4.0.1
 Werkzeug==3.0.3
 python-dotenv==1.0.1
 gunicorn==22.0.0
+requests==2.32.3
+PyJWT==2.10.1
+
+# Firebase
+firebase-admin==7.0.0
+
+# MongoDB
+pymongo==4.8
+mongoengine==0.27.0
+dnspython==2.6.1
+
+# Security
+cryptography==43.0.0
+bcrypt==4.2.0
+
+# Cloudinary
+cloudinary==1.41.0
+
+# Twilio
+twilio==9.3.0
+
+# Optional
+Pillow==10.4.0
