@@ -7,6 +7,7 @@ export default function AnimalRescue() {
   const { user } = useAuth();
   const [animalCount, setAnimalCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const API_BASE = process.env.REACT_APP_API_BASE;
 
   useEffect(() => {
     if (user) {
@@ -17,7 +18,7 @@ export default function AnimalRescue() {
   const fetchAnimalCount = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:5000/api/requests/animal/count", {
+      const res = await fetch(`${API_BASE}/api/requests/animal/count`, {
         headers: { "Authorization": `Bearer ${token}` }
       });
       const data = await res.json();
