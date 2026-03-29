@@ -46,7 +46,11 @@ mongo_uri = os.getenv("MONGO_URI")
 if not mongo_uri:
     raise Exception("❌ MONGO_URI not found in environment variables")
 
-client = MongoClient(mongo_uri)
+client = MongoClient(
+    mongo_uri,
+    tls=True,
+    tlsAllowInvalidCertificates=True
+)
 
 try:
     client.admin.command('ping')
