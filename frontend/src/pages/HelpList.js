@@ -11,6 +11,7 @@ export default function HelpList() {
   const [filteredRequests, setFilteredRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingResolve, setLoadingResolve] = useState({});
+  const API_BASE = process.env.REACT_APP_API_BASE;
 
   const typeFilter = searchParams.get('type') || 'all';
 
@@ -31,7 +32,7 @@ export default function HelpList() {
         
         console.log(`📡 Fetching ${typeFilter}: ${endpoint}`);
         
-        const response = await fetch(`http://localhost:5000${endpoint}`, {
+        const response = await fetch(`${API_BASE}${endpoint}`, {
           headers: { "Authorization": `Bearer ${token}` }
         });
         
@@ -75,7 +76,7 @@ export default function HelpList() {
     setLoadingResolve(prev => ({ ...prev, [requestId]: true }));
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000/api/requests/${requestId}/resolve`, {
+      const response = await fetch(`${API_BASE}/api/requests/${requestId}/resolve`, {
         method: 'POST',
         headers: { 
           "Authorization": `Bearer ${token}`, 
