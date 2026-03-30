@@ -54,7 +54,7 @@ export default function Navbar() {
             textDecoration: "none"
           }}
         >
-          🙏 HelpHub
+          HelpHub
         </Link>
 
         <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
@@ -132,7 +132,7 @@ export default function Navbar() {
                     gap: "8px"
                   }}
                 >
-                  🛠️ Admin Panel
+                  Admin Panel
                 </Link>
               )}
 
@@ -143,7 +143,7 @@ export default function Navbar() {
                 }}
               >
                 {userData.name || userData.email}
-                {isAdmin && " 👑"}
+                {isAdmin}
               </span>
 
               <button
