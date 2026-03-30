@@ -682,9 +682,11 @@ def get_unresolved_requests(current_user):
                 requester = users_collection.find_one({"_id": created_by})
 
         if requester:
+            req["requester_name"] = requester.get('name', "")
             req["requester_phone"] = requester.get('phone', "")
             req["requester_email"] = requester.get('email', "")
         else:
+            req["requester_name"] = ""
             req["requester_phone"] = ""
             req["requester_email"] = ""
 
