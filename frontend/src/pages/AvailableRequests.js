@@ -35,8 +35,6 @@ export default function AvailableRequests() {
   useEffect(() => {
     if (user) {
       fetchAvailableRequests();
-      const interval = setInterval(fetchAvailableRequests, 15000);
-      return () => clearInterval(interval);
     }
   }, [user]);
 
@@ -163,6 +161,20 @@ export default function AvailableRequests() {
         >
           ➕ New Request
         </Link>
+        <button
+          onClick={fetchAvailableRequests}
+          style={{
+            background: "#f3f4f6",
+            color: "#374151",
+            padding: "12px 24px",
+            border: "none",
+            borderRadius: "12px",
+            fontWeight: "600",
+            cursor: "pointer",
+          }}
+        >
+          🔄 Refresh
+        </button>
       </div>
 
       {/* Available Requests List */}
