@@ -8,7 +8,7 @@ export default function Status() {
   const [myRequests, setMyRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
-  const API_BASE = process.env.REACT_APP_API_BASE;
+  const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
 
   useEffect(() => {
     const fetchMyRequests = async () => {

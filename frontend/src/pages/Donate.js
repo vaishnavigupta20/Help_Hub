@@ -5,7 +5,7 @@ export default function Donate() {
   const [ngos, setNgos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const API_BASE = process.env.REACT_APP_API_BASE;
+  const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
 
   // ✅ FETCH REAL NGOs FROM YOUR FLASK API
   useEffect(() => {

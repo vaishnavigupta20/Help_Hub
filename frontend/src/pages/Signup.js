@@ -14,7 +14,7 @@ export default function Signup() {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const API_BASE = process.env.REACT_APP_API_BASE;
+  const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
   const navigate = useNavigate();
 
   const handleChange = (e) => {

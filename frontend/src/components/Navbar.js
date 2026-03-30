@@ -16,12 +16,12 @@ export default function Navbar() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("adminToken"); // ✅ ADMIN LOGOUT
-    navigate(`${API_BASE}`);
+    navigate('/');
   };
 
   const handleAdminLogout = () => {
     localStorage.removeItem("adminToken");
-    navigate(`${API_BASE}/admin-login`);
+    navigate('/admin-login');
   };
 
   return (

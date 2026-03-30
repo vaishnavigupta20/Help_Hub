@@ -1,12 +1,16 @@
 // src/services/api.js
 
-const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000";
 
 const getHeaders = () => ({
   "Content-Type": "application/json",
 });
 
-// Helper to handle JSON response + errors
+const authHeaders = () => ({
+  "Content-Type": "application/json",
+  Authorization: `Bearer ${localStorage.getItem("token")}`,
+});
+
 const handleResponse = async (response) => {
   const data = await response.json();
   if (!response.ok) {
@@ -18,50 +22,27 @@ const handleResponse = async (response) => {
 // ================= USER SERVICE =================
 
 const userService = {
-  // POST /api/signup
   signup: async ({ name, email, password, role = "user", phone = "" }) => {
-    const body = { name, email, password, role, phone };
     const res = await fetch(`${API_BASE}/api/signup`, {
       method: "POST",
       headers: getHeaders(),
-      body: JSON.stringify(body),
+      body: JSON.stringify({ name, email, password, role, phone }),
     });
     return handleResponse(res);
   },
 
-  // POST /api/login
   login: async ({ email, password }) => {
-    const body = { email, password };
     const res = await fetch(`${API_BASE}/api/login`, {
       method: "POST",
       headers: getHeaders(),
-      body: JSON.stringify(body),
+      body: JSON.stringify({ email, password }),
     });
     return handleResponse(res);
   },
 
-  // GET /user/api/<id>
-  getUser: async (id) => {
-    const res = await fetch(`${API_BASE}/user/api/${id}`, {
-      headers: getHeaders(),
-    });
-    return handleResponse(res);
-  },
-
-  // PUT /user/api/<id>
-  updateUser: async (id, updates) => {
-    const res = await fetch(`${API_BASE}/user/api/${id}`, {
-      method: "PUT",
-      headers: getHeaders(),
-      body: JSON.stringify(updates),
-    });
-    return handleResponse(res);
-  },
-
-  // GET /user/api/<id>/stats
-  getUserStats: async (id) => {
-    const res = await fetch(`${API_BASE}/user/api/${id}/stats`, {
-      headers: getHeaders(),
+  getUser: async () => {
+    const res = await fetch(`${API_BASE}/api/user/me`, {
+      headers: authHeaders(),
     });
     return handleResponse(res);
   },
@@ -70,60 +51,36 @@ const userService = {
 // ================= REQUEST SERVICE =================
 
 const requestService = {
-  // GET /request/api
   listRequests: async () => {
-    const res = await fetch(`${API_BASE}/request/api`, {
-      headers: getHeaders(),
+    const res = await fetch(`${API_BASE}/api/requests/unresolved`, {
+      headers: authHeaders(),
     });
     const data = await handleResponse(res);
-    return data.data || [];
+    return data.requests || [];
   },
 
-  // GET /request/api/<id>
-  getRequest: async (id) => {
-    const res = await fetch(`${API_BASE}/request/api/${id}`, {
-      headers: getHeaders(),
+  getMyRequests: async () => {
+    const res = await fetch(`${API_BASE}/api/requests/my`, {
+      headers: authHeaders(),
     });
     const data = await handleResponse(res);
-    return data.data;
+    return data.requests || [];
   },
 
-  // POST /request (for web form, not JSON)
-  // For JSON‑based creation, you’d add a POST /request/api route later
   createRequest: async (reqData) => {
-    const formData = new FormData();
-    Object.keys(reqData).forEach((key) => {
-      formData.append(key, reqData[key]);
-    });
-
-    const res = await fetch(`${API_BASE}/request`, {
+    const res = await fetch(`${API_BASE}/api/requests`, {
       method: "POST",
-      // don't set Content-Type; browser does it for multipart/form-data
-      body: formData,
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(text || "Failed to create request");
-    }
-
-    return { success: true, message: "Request posted successfully" };
-  },
-
-  // POST /request/api/accept/<id>
-  acceptRequest: async (id) => {
-    const res = await fetch(`${API_BASE}/request/api/accept/${id}`, {
-      method: "POST",
-      headers: getHeaders(),
+      headers: authHeaders(),
+      body: JSON.stringify(reqData),
     });
     return handleResponse(res);
   },
 
-  // POST /request/api/complete/<id>
-  completeRequest: async (id) => {
-    const res = await fetch(`${API_BASE}/request/api/complete/${id}`, {
+  resolveRequest: async (id, data = {}) => {
+    const res = await fetch(`${API_BASE}/api/requests/${id}/resolve`, {
       method: "POST",
-      headers: getHeaders(),
+      headers: authHeaders(),
+      body: JSON.stringify(data),
     });
     return handleResponse(res);
   },
@@ -132,24 +89,9 @@ const requestService = {
 // ================= DONATION SERVICE =================
 
 const donationService = {
-  // GET /donate/api
-  listDonations: async () => {
-    const res = await fetch(`${API_BASE}/donate/api`, {
-      headers: getHeaders(),
-    });
-    const data = await handleResponse(res);
-    return data.data || [];
-  },
-
-  // POST /donate/api (JSON)
-  createDonation: async (donationData) => {
-    const res = await fetch(`${API_BASE}/donate/api`, {
-      method: "POST",
-      headers: getHeaders(),
-      body: JSON.stringify(donationData),
-    });
-    return handleResponse(res);
-  },
+  // Donation routes not yet implemented in backend
+  listDonations: async () => [],
+  createDonation: async () => ({ success: false, error: "Not implemented" }),
 };
 
 // ================= MODULE EXPORT =================

@@ -1,5 +1,6 @@
 // src/components/FeatureCard.js
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function FeatureCard({ title, description, icon, link }) {
   return (
@@ -7,9 +8,9 @@ export default function FeatureCard({ title, description, icon, link }) {
       <h3>{title}</h3>
       <p>{description}</p>
       {link && (
-        <a href={link} className="btn btn-outline">
+        <Link to={link} className="btn btn-outline">
           Learn More
-        </a>
+        </Link>
       )}
     </div>
   );

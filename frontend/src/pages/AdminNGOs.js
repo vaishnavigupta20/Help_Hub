@@ -16,7 +16,7 @@ export default function AdminNGOs() {
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
-  const API_BASE = process.env.REACT_APP_API_BASE;
+  const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
 
   // ✅ CHECK ADMIN LOGIN
   useEffect(() => {

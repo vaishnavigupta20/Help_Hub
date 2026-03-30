@@ -11,7 +11,7 @@ export default function HelpList() {
   const [filteredRequests, setFilteredRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingResolve, setLoadingResolve] = useState({});
-  const API_BASE = process.env.REACT_APP_API_BASE;
+  const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
 
   const typeFilter = searchParams.get('type') || 'all';
 

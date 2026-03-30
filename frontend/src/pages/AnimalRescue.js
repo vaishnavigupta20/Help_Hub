@@ -7,7 +7,7 @@ export default function AnimalRescue() {
   const { user } = useAuth();
   const [animalCount, setAnimalCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const API_BASE = process.env.REACT_APP_API_BASE;
+  const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
 
   useEffect(() => {
     if (user) {
