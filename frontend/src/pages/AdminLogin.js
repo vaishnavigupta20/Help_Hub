@@ -1,6 +1,7 @@
 // src/pages/AdminLogin.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -8,28 +9,23 @@ export default function AdminLogin() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+    setError('');
     try {
-      const res = await fetch(`${API_BASE}/api/admin/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      
-      const data = await res.json();
-      if (data.success) {
-        localStorage.setItem('adminToken', data.token);
+      const result = await login(email, password);
+      if (result.success && result.user.role === 'admin') {
         navigate('/admin/ngos');
+      } else if (result.success) {
+        setError('Access denied. Not an admin account.');
       } else {
-        setError(data.error || 'Login failed');
+        setError(result.error || 'Login failed');
       }
-    } catch (error) {
-      setError('Network error - check Flask backend');
+    } catch (err) {
+      setError('Network error - check backend');
     } finally {
       setLoading(false);
     }
