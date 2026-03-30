@@ -2,6 +2,7 @@
 import React from "react";
 
 export default function Footer() {
+  const API_BASE = process.env.REACT_APP_API_BASE;
   return (
     <footer className="footer">
       <div className="container">
@@ -16,8 +17,8 @@ export default function Footer() {
           Made with ❤️ for communities in need.
         </p>
         <p>
-          <a href="/privacy">Privacy Policy</a> •{" "}
-          <a href="/terms">Terms of Service</a>
+          <a href=`${API_BASE}/privacy`>Privacy Policy</a> •{" "}
+          <a href=`${API_BASE}/terms`>Terms of Service</a>
         </p>
       </div>
     </footer>
