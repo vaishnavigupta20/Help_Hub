@@ -2,6 +2,7 @@
 import React from "react";
 
 export default function Hero() {
+  const API_BASE = process.env.REACT_APP_API_BASE;
   return (
     <section className="hero">
       <h1>HelpHub – Emergency Help & Animal Rescue</h1>
@@ -10,10 +11,10 @@ export default function Hero() {
         find blood donors, and get food/clothes/medicine in real time.
       </p>
       <div className="hero-actions">
-        <a href="/request" className="btn btn-primary">
+        <a href=`${API_BASE}/request` className="btn btn-primary">
           Request Help
         </a>
-        <a href="/donate" className="btn btn-outline">
+        <a href=`{API_BASE}/donate` className="btn btn-outline">
           Donate
         </a>
       </div>
