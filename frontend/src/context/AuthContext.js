@@ -1,6 +1,8 @@
 // src/context/AuthContext.js - FIXED NETWORK ERROR
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+const API_BASE = process.env.REACT_APP_API_BASE;
+
 const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -19,7 +21,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem('token');  // ← FIXED: was 'userToken'
     if (token) {
-      fetch('/api/user/me', {  // ← FIXED: Use proxy URL
+      fetch(`${API_BASE}/api/user/me`, {
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -44,7 +46,7 @@ export const AuthProvider = ({ children }) => {
   // ✅ FIXED: Use proxy URL + consistent token key
   const login = async (email, password) => {
     try {
-      const response = await fetch('/api/login', {  // ← Proxy URL
+      const response = await fetch(`${API_BASE}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -70,7 +72,7 @@ export const AuthProvider = ({ children }) => {
   // ✅ FIXED: Use proxy URL consistently
   const signup = async (name, email, password, role, phone) => {
     try {
-      const response = await fetch('/api/signup', {  // ← Proxy URL
+      const response = await fetch(`${API_BASE}/api/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, role, phone })
