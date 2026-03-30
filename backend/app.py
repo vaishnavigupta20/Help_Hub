@@ -227,7 +227,8 @@ def send_sms_to_all_users(request_data):
     sms_failed = 0
 
     users = list(users_collection.find({
-        "phone": {"$exists": True, "$ne": ""}
+        "phone": {"$exists": True, "$ne": ""},
+        "_id": {"$ne": ObjectId(request_data.get("createdBy")) if request_data.get("createdBy") else None}
     }))
 
     sms_text = (
@@ -242,12 +243,17 @@ def send_sms_to_all_users(request_data):
         if not phone:
             continue
 
+        # Normalize to E.164 — add +91 if no country code
+        if not phone.startswith("+"):
+            phone = "+91" + phone.lstrip("0")
+
         result = send_sms(phone, sms_text)
         if result.get("sent"):
             sms_sent += 1
         else:
             sms_failed += 1
 
+    print(f"📱 SMS summary: {sms_sent} sent, {sms_failed} failed")
     return {"sent": sms_sent, "failed": sms_failed}
 
 

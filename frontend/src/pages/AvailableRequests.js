@@ -34,9 +34,15 @@ export default function AvailableRequests() {
 
   useEffect(() => {
     if (user) {
-      const fetchAvailableRequests = async () => {
+      fetchAvailableRequests();
+      const interval = setInterval(fetchAvailableRequests, 15000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
+  const fetchAvailableRequests = async () => {
         try {
-          setLoading(true);
+          if (!availableRequests.length) setLoading(true);
           const token = localStorage.getItem("token");
 
           const params = new URLSearchParams({
@@ -82,11 +88,7 @@ export default function AvailableRequests() {
         } finally {
           setLoading(false);
         }
-      };
-
-      fetchAvailableRequests();
-    }
-  }, [user]);
+  };
 
   const acceptAndResolveRequest = async (requestId) => {
     setLoadingAccept((prev) => ({ ...prev, [requestId]: true }));
