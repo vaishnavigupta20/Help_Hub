@@ -865,4 +865,4 @@ if __name__ == '__main__':
     print("✅ Cloudinary photo upload enabled")
     print("✅ SMS enabled" if twilio_client else "⚠️ SMS not configured")
     # app.run(debug=True, port=5000)
-    app.run(debug=True, port=5000, use_reloader=False)
+    app.run()
