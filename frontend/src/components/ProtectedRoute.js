@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 export default function ProtectedRoute({ children, adminOnly = false }) {
   const { user, loading, isAdminAuthenticated } = useAuth();
   const location = useLocation();
+  const API_BASE = process.env.REACT_APP_API_BASE;
 
   if (loading) {
     return (
@@ -25,13 +26,13 @@ export default function ProtectedRoute({ children, adminOnly = false }) {
 
   if (adminOnly) {
     if (!isAdminAuthenticated && (!user || user.role !== 'admin')) {
-      return <Navigate to="/admin-login" replace state={{ from: location }} />;
+      return <Navigate to=`${API_BASE}/admin-login` replace state={{ from: location }} />;
     }
     return children;
   }
 
   if (!user) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
+    return <Navigate to=`${API_BASE}/login` replace state={{ from: location }} />;
   }
 
   return children;
