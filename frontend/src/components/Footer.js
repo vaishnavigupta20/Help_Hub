@@ -1,8 +1,8 @@
 // src/components/Footer.js
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function Footer() {
-  const API_BASE = process.env.REACT_APP_API_BASE;
   return (
     <footer className="footer">
       <div className="container">
@@ -17,8 +17,8 @@ export default function Footer() {
           Made with ❤️ for communities in need.
         </p>
         <p>
-          <a href=`${API_BASE}/privacy`>Privacy Policy</a> •{" "}
-          <a href=`${API_BASE}/terms`>Terms of Service</a>
+          <Link to="/privacy">Privacy Policy</Link> •{" "}
+          <Link to="/terms">Terms of Service</Link>
         </p>
       </div>
     </footer>
