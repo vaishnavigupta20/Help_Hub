@@ -10,17 +10,18 @@ export default function Navbar() {
   const isLoggedIn = !!token;
   const isAdmin = !!adminToken; // ✅ ADMIN DETECTION
   const navigate = useNavigate();
+  const API_BASE = process.env.REACT_APP_API_BASE;
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("adminToken"); // ✅ ADMIN LOGOUT
-    navigate("/");
+    navigate(`${API_BASE}`);
   };
 
   const handleAdminLogout = () => {
     localStorage.removeItem("adminToken");
-    navigate("/admin-login");
+    navigate(`${API_BASE}/admin-login`);
   };
 
   return (
