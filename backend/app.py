@@ -864,5 +864,4 @@ if __name__ == '__main__':
     print("✅ Firebase Cloud Messaging enabled" if firebase_admin._apps else "⚠️ FCM not configured")
     print("✅ Cloudinary photo upload enabled")
     print("✅ SMS enabled" if twilio_client else "⚠️ SMS not configured")
-    # app.run(debug=True, port=5000)
-    app.run()
+    app.run(debug=True)
