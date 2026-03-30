@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
         throw new Error('Token invalid');
       })
       .then(data => {
-        setUser(data);  // ← Backend returns full user object
+        setUser(data.user || data);
       })
       .catch(() => {
         localStorage.removeItem('token');  // ← FIXED: consistent key
@@ -94,7 +94,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');  // ← FIXED: consistent key
+    localStorage.removeItem('token');
+    localStorage.removeItem('adminToken');
     setUser(null);
   };
 
